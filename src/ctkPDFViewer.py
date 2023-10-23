@@ -2,6 +2,7 @@ try:
     from tkinter import *
     from customtkinter import *
     import fitz
+    from tkinter import ttk
     from tkinter.ttk import Progressbar
     from threading import Thread
     import math
@@ -9,16 +10,17 @@ except Exception as e:
     print(f"This error occured while importing neccesary modules or library {e}")
 
 class ShowPdf():
-
     img_object_li = []
     max_width = 0
+        
 
-    def pdf_view(self,master,width=1200,height=600,pdf_location="",bar=True,load="after"):
+    def pdf_view(self, master, frame=None, width=1200, height=600, pdf_location="", bar=True, load="after"):
+        frame = master if frame is None else frame
+        new_frame = ttk.Frame(frame,width= width,height= height) # bd_color="transparent"
+        new_frame.grid(column=0, row=0)
 
-        self.frame = CTkFrame(master,width= width,height= height,bg_color="transparent")
-
-        scroll_y = CTkScrollbar(self.frame,orientation="vertical")
-        scroll_x = CTkScrollbar(self.frame,orientation="horizontal")
+        scroll_y = CTkScrollbar(new_frame,orientation="vertical")
+        scroll_x = CTkScrollbar(new_frame,orientation="horizontal")
 
         scroll_x.pack(fill="x",side="bottom")
         scroll_y.pack(fill="y",side="right")
@@ -27,17 +29,17 @@ class ShowPdf():
         percentage_load = StringVar()
 
         if bar==True and load=="after":
-            self.display_msg = CTkLabel(master=master, textvariable=percentage_load)
+            self.display_msg = CTkLabel(master=new_frame, textvariable=percentage_load)
             self.display_msg.pack(pady=10)
 
-            loading = Progressbar(self.frame,orient= HORIZONTAL,length=100,mode='determinate')
+            loading = Progressbar(new_frame,orient= HORIZONTAL,length=100,mode='determinate')
             loading.pack(side = TOP,fill=X)
 
-        self.text = Text(self.frame,yscrollcommand=scroll_y.set,xscrollcommand= scroll_x.set,width= width,height= height, bg=master.cget("bg"))
-        self.text.pack(side="left")
+        page_text = Text(new_frame,yscrollcommand=scroll_y.set,xscrollcommand= scroll_x.set,width= width,height= height, bg=master.cget("bg"))
+        page_text.pack()
 
-        scroll_x.configure(command=self.text.xview)
-        scroll_y.configure(command=self.text.yview)
+        scroll_x.configure(command=page_text.xview)
+        scroll_y.configure(command=page_text.yview)
 
         def add_img():
             precentage_dicide = 0
@@ -62,9 +64,9 @@ class ShowPdf():
                 self.display_msg.pack_forget()
 
             for page in self.img_object_li:
-                self.text.image_create(END,image=page)
-                self.text.insert(END,"\n\n")
-            self.text.configure(state="disabled")
+                page_text.image_create(END,image=page)
+                page_text.insert(END,"\n\n")
+            page_text.configure(state="disabled")
             master.geometry(f"{self.max_width}x{master.winfo_height()}")
 
         def start_pack():
@@ -72,11 +74,11 @@ class ShowPdf():
             t1.start()
 
         if load=="after":
-            master.after(250,start_pack)
+            new_frame.after(250,start_pack)
         else:
             start_pack()
 
-        return self.frame, self.max_width
+        return new_frame
 
 
 
