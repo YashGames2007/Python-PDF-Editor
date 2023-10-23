@@ -5,7 +5,7 @@ from tkinter import filedialog as fd
 import customtkinter as ctk
 import ctkPDFViewer as pdf_viewer
 from PIL import ImageTk, Image
-from miner import PDFMiner
+# from miner import PDFMiner
 import pdfviewer_helper_functions as func
 
 class PDFViewerFunctions:

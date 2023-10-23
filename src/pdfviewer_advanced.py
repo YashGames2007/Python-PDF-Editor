@@ -4,8 +4,8 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 import customtkinter as ctk
 from CTkMenuBar import menu_bar, CustomDropdownMenu
-from PIL import ImageTk, Image
-from miner import PDFMiner
+# from PIL import ImageTk, Image
+# from miner import PDFMiner
 import pdfviewer_backend as backend
 
 ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
