@@ -1,67 +1,32 @@
 import tkinter as tk
-import tkinter.ttk as ttk
-from ctknotebook import CustomNotebook
+from tkinter import ttk
 
-class Example(tk.Tk):
-    def __init__(self):
-        tk.Tk.__init__(self)
-        self.canvas = tk.Canvas(self, borderwidth=0)
-        self.frame = tk.Frame(self.canvas)
+# Create instance
+win = tk.Tk()   
 
-        self.vsb = tk.Scrollbar(self, command=self.canvas.xview)
-        self.canvas.configure(xscrollcommand=self.vsb.set)
+# Add a title       
+win.title("Python GUI with Notebook")
 
-        self.canvas.pack(side="left", fill="both", expand=True)
-        self.frame.pack(side="top", fill="both", expand=True)
-        # self.vsb.grid(row=0, column=0, sticky="ew")
+# Create Tab Control
+tabControl = ttk.Notebook(win)         
 
-        self.canvas.create_window((3,2), window=self.frame, anchor="center", tags="self.frame")
+tab1 = ttk.Frame(tabControl)            
+tabControl.add(tab1, text='Tab 1')    
 
-        self.frame.bind("<Configure>", self.frame_configure)
-        self.populate()
+tab2 = ttk.Frame(tabControl)            
+tabControl.add(tab2, text='Tab 2')   
 
-    def populate(self):
-        tabs = CustomNotebook(self.frame, width=100, height=100)
-        tabs.bind("<MouseWheel>", self.on_mousewheel)
-        for tab in range(5):
-            tab_frame = ttk.Frame(tabs)
-            tabs.add(tab_frame, text=" Tab {}  ".format(tab))
-            scroller = ttk.Scrollbar(tab_frame, orient="vertical")
-            scroller.pack(fill="y", side="right")
-            # tab_frame.pack(fill="both", side="top", expand=True)
+tabControl.pack(expand=1, fill="both")  
 
-        tabs.pack(fill="both", side="top", expand=True)
+# Create a frame and text box for each tab
+frame1 = ttk.Frame(tab1)
+frame1.grid(column=0, row=0)
+text1 = tk.Text(frame1, width=20, height=5)
+text1.pack()
 
-    def frame_configure(self, event):
-        x1, y1, _, y2 = self.canvas.bbox("all")
-        max_width = max(self.frame.winfo_width(), self.canvas.winfo_width())
-        self.canvas.configure(scrollregion=(x1, y1, max_width, y2))
+frame2 = ttk.Frame(tab2)
+frame2.grid(column=0, row=0)
+text2 = tk.Text(frame2, width=20, height=5)
+text2.pack()
 
-    def on_mousewheel(self, event):
-        self.canvas.xview_scroll(int(-1*(event.delta/120)), "units")
-
-if __name__ == "__main__":
-    app = Example()
-    app.mainloop()
-
-# import tkinter as tk
-
-# def on_mousewheel(event):
-#     canvas.xview_scroll(int(-1*(event.delta/120)), "units")
-
-# root = tk.Tk()
-# canvas = tk.Canvas(root)
-# scrollbar = tk.Scrollbar(root, orient="horizontal", command=canvas.xview)
-# canvas.configure(xscrollcommand=scrollbar.set, scrollregion=(0, 0, 100, 0))
-
-# # Add some items to the canvas
-# for i in range(100):
-#     canvas.create_text(50 + i*10, 10, text=f"Item {i+1}", anchor="w")
-
-# canvas.pack(side="left", fill="both", expand=True)
-# scrollbar.pack(side="bottom", fill="x")
-
-# # Bind the mouse wheel event to the on_mousewheel function
-# root.bind("<MouseWheel>", on_mousewheel)
-
-# root.mainloop()
+win.mainloop()

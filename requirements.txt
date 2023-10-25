@@ -1,0 +1,6 @@
+customtkinter
+pypdf2
+pymupdf
+tkPDFViewer
+pillow
+pdf2image
