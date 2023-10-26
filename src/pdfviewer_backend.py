@@ -72,19 +72,19 @@ class PDFViewerFunctions:
 
 
     def select_dropdown_menu(self, option):
-        pdf_path, page_no = self.get_pdf()
-        self.tab_layout.dropdown[option](pdf_path, page_no)
+        pdf_path, page_no, password = self.get_pdf()
+        self.tab_layout.dropdown[option](pdf_path, page_no, password)
         self.tab_layout.file_dropdown_menu.place_forget()
 
     def get_pdf(self):
         try:
             id = self.tab_layout.tab_control.select()
             text_widget = self.text_map[id]
-            photo_image_pages, path = self.pdf_view.pdf_objects[text_widget]
+            photo_image_pages, path, password = self.pdf_view.pdf_objects[text_widget]
 
             # Get the name of the image under the cursor
             index = int(text_widget.image_cget("current", "name"))
-            return path, index
+            return path, index, password
         except Exception as e:
             pass
 

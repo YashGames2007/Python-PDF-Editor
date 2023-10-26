@@ -76,7 +76,7 @@ class ShowPdf():
         def add_img():
             precentage_dicide = 0
             open_pdf = fitz.open(pdf_location)
-
+            password = None
             while open_pdf.isEncrypted:
                 # try:
                 password = self.get_password(master)
@@ -117,7 +117,7 @@ class ShowPdf():
                 page_text.insert(END,"\n\n")
                 _index += 1
             page_text.configure(state="disabled")
-            self.pdf_objects[page_text] = (self.img_object_li[:], pdf_location)
+            self.pdf_objects[page_text] = (self.img_object_li[:], pdf_location, password)
             master.geometry(f"{self.max_width}x{master.winfo_height()}")
 
         def start_pack():
