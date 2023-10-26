@@ -178,6 +178,9 @@ class CustomDropdownMenu(customtkinter.CTkFrame):
         self._hideChildrenMenus()
         self._hide()
         self._hideParentMenus()
+    
+    def hide_everything(self):
+        self._hideAllMenus(self)
         
     def _collapseSiblingSubmenus(self, button: _CDMOptionButton | _CDMSubmenuButton, *args, **kwargs) -> None:
         for option in self._options_list:

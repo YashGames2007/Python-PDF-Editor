@@ -1,43 +1,49 @@
+import fitz
 import tkinter as tk
-from tkinter import ttk
 from tkinter import filedialog
 
-def create_new_tab():
-    new_tab = ttk.Frame(tab_control)
-    tab_control.add(new_tab)
+class PDFZoomApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("PDF Zoom App")
 
-    # Create a custom tab with a label and a button
-    tab_label = tk.Frame(tab_control.tab(new_tab, 'underline'), background='white')
-    label = tk.Label(tab_label, text='New Tab', background='white')
-    close_button = tk.Button(tab_label, text='x', command=lambda: close_tab(new_tab), background='white', padx=2, pady=2)
-    
-    label.pack(side='left')
-    close_button.pack(side='right')
-    tab_control.tab(new_tab, underline=tab_label)
+        self.zoom_factor = 1.0  # Initial zoom factor
+        self.pdf_document = None
 
-def close_tab(tab):
-    tab_control.forget(tab)
+        self.load_button = tk.Button(root, text="Load PDF", command=self.load_pdf)
+        self.load_button.pack()
 
-def open_file():
-    filedialog.askopenfilename()
-    create_new_tab()
-    tab_control.pack(expand=1, fill='both')  # pack the tab control here
+        self.zoom_in_button = tk.Button(root, text="Zoom In", command=self.zoom_in)
+        self.zoom_in_button.pack()
 
-root = tk.Tk()
-root.title("Menu Bar and Tab View")
+        self.zoom_out_button = tk.Button(root, text="Zoom Out", command=self.zoom_out)
+        self.zoom_out_button.pack()
 
-# Create a menu bar
-menu_bar = tk.Menu(root)
-root.config(menu=menu_bar)
+    def load_pdf(self):
+        file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
 
-# Create a File menu
-file_menu = tk.Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label="File", menu=file_menu)
+        if file_path:
+            self.pdf_document = fitz.open(file_path)
 
-# Add Open option to File menu
-file_menu.add_command(label="Open", command=open_file)
+    def zoom_in(self):
+        if self.pdf_document:
+            self.zoom_factor *= 1.2  # Adjust the zoom factor as needed
+            self.update_pdf_display()
 
-# Create a Tab Control
-tab_control = ttk.Notebook(root)
+    def zoom_out(self):
+        if self.pdf_document:
+            self.zoom_factor /= 1.2  # Adjust the zoom factor as needed
+            self.update_pdf_display()
 
-root.mainloop()
+    def update_pdf_display(self):
+        if self.pdf_document:
+            for page in self.pdf_document:
+                page.set_zoom(self.zoom_factor)
+
+    def run(self):
+        self.root.mainloop()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PDFZoomApp(root)
+    app.run()

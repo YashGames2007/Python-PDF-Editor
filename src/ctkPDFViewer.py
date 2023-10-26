@@ -21,11 +21,11 @@ class ShowPdf():
     def pdf_view(self, master, frame=None, width=1200, height=600, pdf_location="", bar=True, load="after"):
         self.master = master
         frame = master if frame is None else frame
-        new_frame = ttk.Frame(frame,width= width,height= height) # bd_color="transparent"
+        new_frame = CTkFrame(frame,width= width,height= height) # bd_color="transparent"
         new_frame.grid(column=0, row=0)
 
-        scroll_y = CTkScrollbar(new_frame,orientation="vertical")
-        scroll_x = CTkScrollbar(new_frame,orientation="horizontal")
+        scroll_y = CTkScrollbar(new_frame,orientation="vertical", fg_color=master.cget("bg"))
+        scroll_x = CTkScrollbar(new_frame,orientation="horizontal", fg_color=master.cget("bg"))
 
         scroll_x.pack(fill="x",side="bottom")
         scroll_y.pack(fill="y",side="right")
@@ -34,10 +34,10 @@ class ShowPdf():
         percentage_load = StringVar()
 
         if bar==True and load=="after":
-            self.display_msg = CTkLabel(master=new_frame, textvariable=percentage_load)
+            self.display_msg = CTkLabel(master=new_frame, textvariable=percentage_load, bg_color=master.cget("bg"))
             self.display_msg.pack(pady=10)
 
-            loading = Progressbar(new_frame,orient= HORIZONTAL,length=100,mode='determinate')
+            loading = CTkProgressBar(new_frame,orientation="horizontal",mode='determinate')
             loading.pack(side = TOP,fill=X)
 
         page_text = Text(new_frame,yscrollcommand=scroll_y.set,xscrollcommand= scroll_x.set,width= width,height= height, bg=master.cget("bg"))

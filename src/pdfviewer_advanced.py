@@ -8,7 +8,7 @@ from CTkMenuBar import menu_bar, CustomDropdownMenu
 # from miner import PDFMiner
 import pdfviewer_backend as backend
 
-ctk.set_appearance_mode("System")  # Modes: system (default), light, dark
+ctk.set_appearance_mode("dark")  # Modes: system (default), light, dark
 ctk.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
 class PDFViewer():
@@ -23,62 +23,55 @@ class PDFViewer():
         self.map_functions()
         self.build_layout()
 
-
-    # def select_option_file_menu(self, option):
-    #     print(f'Option selected: {option}')
-    #     self.menubar["File"][option]()
-    
-    # def select_option_edit_menu(self, option):
-    #     print(f'Option selected: {option}')
-    #     self.menubar["Edit"][option]()
-
     def build_layout(self):
         # Create a Frame for the menubar
+        self.drop_down = {}
         self.menubar_frame = menu_bar.CTkMenuBar(self.app, bg_color="#2c2c2e")
 
         # Create a DropdownMenu for menu in menubar frame
         for menu, dropdown in self.menubar.items():
             menu_button = self.menubar_frame.add_cascade(text=menu)
             menu_dropdown = CustomDropdownMenu(widget=menu_button, hover_color="#144870", width=100, border_color="black", border_width=0.2, corner_radius=0,font=ctk.CTkFont(family="sans-serif", size=12))
+            self.drop_down[menu] = menu_dropdown
             for item, runner in dropdown.items():
-                menu_dropdown.add_option(option=item, command=runner)
+                if type(runner) == dict:
+                    sub_menu = menu_dropdown.add_submenu("Export As", hover_color="#144870", border_color="black", border_width=0.2, corner_radius=0,font=ctk.CTkFont(family="sans-serif", size=12))
+                    for sub_item, sub_runner in runner.items():
+                        sub_menu.add_option(option=sub_item, command=sub_runner)
+                else:
+                    menu_dropdown.add_option(option=item, command=runner)
 
-        # file_dropdown_menu = DropdownMenu(menubar_frame, text='File', width=40, fg_color="transparent", command=self.select_option_file_menu, options=self.menubar["File"].keys())
-        # file_dropdown_menu.pack(side='left')
     
     def map_functions(self):
         self.menubar = {}
         self.menubar["File"] = {
             "Open": self.backend.open,
             "Save": self.backend.save,
-            "Export": self.backend.export,
+            "Export": {
+                ".HTML": self.backend.export_to_html,
+                ".JPG/JPEG": self.backend.export_to_jpg,
+            },
             "Close": self.backend.close,
             "Exit": self.backend.exit,
+            "Close Menu": self.close_menu,
         }
         self.menubar["Edit"] = {
             "Encrypt": self.backend.encrypt,
+            "Rename": self.backend.rename,
             "Merge": self.backend.merge,
             "Split": self.backend.split,
+            "Close Menu": self.close_menu,
         }
-        # self.menubar_commands = {
-        #     "File": self.select_option_file_menu,
-        #     "Edit": self.select_option_edit_menu
-        # }
+
+    def close_menu(self, event=None):
+        for menu, dropdown in self.drop_down.items():
+            dropdown.hide_everything()
 
     def launch(self):
         self.app.mainloop()
 
 
-
-
-
-def button_function():
-    print("button pressed")
-
-# Use CTkButton instead of tkinter Button
-# button = ctk.CTkButton(master=app, text="CTkButton", command=button_function)
-# button.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
-
 if __name__ == "__main__":
+    
     pdfViewer = PDFViewer()
     pdfViewer.launch()

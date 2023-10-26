@@ -1,17 +1,16 @@
-import tkinter as tk
-import customtkinter as ctk
-from tkinter import filedialog
-import ctkPDFViewer as pdf
+import fitz
 
-def open_pdf():
-    file_path = filedialog.askopenfilename()
-    pdf_view = pdf.ShowPdf()
-    pdf_frame = pdf_view.pdf_view(root, pdf_location=file_path)
-    pdf_frame.pack()
+# specify the file path
+file_path = "D:\\Programming files\\GitHub\\Repositories\\Python-PDF-Editor\\MML Formulae-1.pdf"
 
-root = ctk.CTk()
+# open the document
+doc = fitz.open(file_path)
 
-button = ctk.CTkButton(root, text="Open PDF", command=open_pdf)
-button.pack()
+# open the output file
+out = open(file_path + ".html", "wb")
 
-root.mainloop()
+for page in doc:  # iterate the document pages
+    text = page.get_text('html').encode("utf8")  # get the page text as HTML
+    out.write(text)  # write the page text to the output file
+
+out.close()  # close the output file
