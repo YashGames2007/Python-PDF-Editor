@@ -1,24 +1,49 @@
+import fitz
 import tkinter as tk
+from tkinter import filedialog
 
-def get_line_number(text_widget):
-    try:
-        selected_text = text_widget.selection_get()
-        print("Selected text:", selected_text)
-    except Exception as e:
-        pass
-    return text_widget.index('insert linestart').split('.')[0]
+class PDFZoomApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("PDF Zoom App")
 
-# root = tk.Tk()
-root = tk.Tk()
-text_widget = tk.Text(root)
-text_widget.pack()
+        self.zoom_factor = 1.0  # Initial zoom factor
+        self.pdf_document = None
 
-def on_touch(event):
-    # Action to perform when the screen is touched
-    # print("Screen touched!")
-    get_line_number(text_widget)
+        self.load_button = tk.Button(root, text="Load PDF", command=self.load_pdf)
+        self.load_button.pack()
 
-root.geometry("800x600")
-root.bind("<Button-1>", on_touch)
+        self.zoom_in_button = tk.Button(root, text="Zoom In", command=self.zoom_in)
+        self.zoom_in_button.pack()
 
-root.mainloop()
+        self.zoom_out_button = tk.Button(root, text="Zoom Out", command=self.zoom_out)
+        self.zoom_out_button.pack()
+
+    def load_pdf(self):
+        file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
+
+        if file_path:
+            self.pdf_document = fitz.open(file_path)
+
+    def zoom_in(self):
+        if self.pdf_document:
+            self.zoom_factor *= 1.2  # Adjust the zoom factor as needed
+            self.update_pdf_display()
+
+    def zoom_out(self):
+        if self.pdf_document:
+            self.zoom_factor /= 1.2  # Adjust the zoom factor as needed
+            self.update_pdf_display()
+
+    def update_pdf_display(self):
+        if self.pdf_document:
+            for page in self.pdf_document:
+                page.set_zoom(self.zoom_factor)
+
+    def run(self):
+        self.root.mainloop()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PDFZoomApp(root)
+    app.run()
