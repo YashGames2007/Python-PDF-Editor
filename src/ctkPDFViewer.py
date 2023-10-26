@@ -11,7 +11,10 @@ except Exception as e:
 
 class ShowPdf():
     img_object_li = []
+    image_object_li = []
     max_width = 0
+    pdf_objects = {}
+
         
 
     def pdf_view(self, master, frame=None, width=1200, height=600, pdf_location="", bar=True, load="after"):
@@ -45,6 +48,9 @@ class ShowPdf():
             precentage_dicide = 0
             open_pdf = fitz.open(pdf_location)
 
+            self.img_object_li = []
+            self.image_object_li = []
+            self.max_width = master.winfo_width()
             for page in open_pdf:
                 pix = page.get_pixmap()
                 pix1 = fitz.pixmap(pix,0) if pix.alpha else pix
@@ -53,6 +59,7 @@ class ShowPdf():
                 original_width = timg.width()
                 self.max_width = max(self.max_width, original_width)
                 self.img_object_li.append(timg)
+                self.image_object_li.append(img)
 
                 if bar==True and load=="after":
                     precentage_dicide = precentage_dicide + 1
@@ -63,10 +70,13 @@ class ShowPdf():
                 loading.pack_forget()
                 self.display_msg.pack_forget()
 
+            _index = 0
             for page in self.img_object_li:
-                page_text.image_create(END,image=page)
+                page_text.image_create(END,image=page, name=f"{_index}")
                 page_text.insert(END,"\n\n")
+                _index += 1
             page_text.configure(state="disabled")
+            self.pdf_objects[page_text] = (self.img_object_li[:], pdf_location)
             master.geometry(f"{self.max_width}x{master.winfo_height()}")
 
         def start_pack():
@@ -78,7 +88,7 @@ class ShowPdf():
         else:
             start_pack()
 
-        return new_frame
+        return new_frame, page_text
 
 
 
