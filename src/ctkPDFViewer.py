@@ -1,5 +1,6 @@
 try:
     from tkinter import *
+    from tkinter import simpledialog
     import tkinter as tk
     from customtkinter import *
     import fitz
@@ -7,9 +8,9 @@ try:
     from tkinter.ttk import Progressbar
     from threading import Thread
     import math
+    import time
 except Exception as e:
     print(f"This error occured while importing neccesary modules or library {e}")
-
 
 class ShowPdf():
     img_object_li = []
@@ -28,25 +29,44 @@ class ShowPdf():
         #     # ttk.messagebox.showinfo("Success", "PDF file opened successfully!")
         self.password = password
 
-    def get_password(self, master):
-        self.password_window = tk.Toplevel(master)
+    def get_password(self):
+        self.password = ""
+        self.password_window = CTkToplevel(self.master)
         self.password_window.title('Enter Password')
         # self.password_window.withdraw()
 
-        self.password_label = Label(self.password_window, text="Enter Password:")
+        self.password_label = CTkLabel(self.password_window, text="Enter Password:")
         self.password_label.pack()
 
-        self.password_entry = Entry(self.password_window, show="*")
+        self.password_entry = CTkEntry(self.password_window, show="*")
         self.password_entry.pack()
 
-        self.submit_button = Button(self.password_window, text="Submit", command=self.open_pdf)
+        self.submit_button = CTkButton(self.password_window, text="Submit", command=self.open_pdf)
         self.submit_button.pack()
 
         while self.password == "":
             pass
-        return self.password
+        password = self.password[:]
+        self.password = ""
+        return password
+
+    def set_password(self):
+        self.password = ""
+        self.password_window = CTkToplevel(self.master)
+        self.password_window.title('Enter Password')
+        # self.password_window.withdraw()
+
+        self.password_label = CTkLabel(self.password_window, text="Enter Password:")
+        self.password_label.pack()
+
+        self.password_entry = CTkEntry(self.password_window, show="*")
+        self.password_entry.pack()
+
+        self.submit_button = CTkButton(self.password_window, text="Submit", command=self.open_pdf)
+        self.submit_button.pack()
 
     def pdf_view(self, master, frame=None, width=1200, height=600, pdf_location="", bar=True, load="after"):
+        self.master = master
         frame = master if frame is None else frame
         new_frame = ttk.Frame(frame,width= width,height= height) # bd_color="transparent"
         new_frame.grid(column=0, row=0)
@@ -78,16 +98,12 @@ class ShowPdf():
             open_pdf = fitz.open(pdf_location)
             password = None
             while open_pdf.isEncrypted:
-                # try:
-                password = self.get_password(master)
+                password = self.get_password()
                 open_pdf.authenticate(password)
                 self.password = ""
                 if not open_pdf.isEncrypted:
                     break
-                #     print("Decrypted")
-                # except Exception as e:
                 tk.messagebox.showerror("Error", str("!WRONG PASSWORD!"))
-                    # return
             
             self.img_object_li = []
             self.image_object_li = []
@@ -130,7 +146,6 @@ class ShowPdf():
             start_pack()
 
         return new_frame, page_text
-
 
 
 

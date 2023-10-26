@@ -24,10 +24,14 @@ class PDFViewer():
         self.build_layout()
 
 
-    def select_option_file_menu(self, option):
-        print(f'Option selected: {option}')
-        self.menubar["File"][option]()
+    # def select_option_file_menu(self, option):
+    #     print(f'Option selected: {option}')
+    #     self.menubar["File"][option]()
     
+    # def select_option_edit_menu(self, option):
+    #     print(f'Option selected: {option}')
+    #     self.menubar["Edit"][option]()
+
     def build_layout(self):
         # Create a Frame for the menubar
         self.menubar_frame = menu_bar.CTkMenuBar(self.app, bg_color="#2c2c2e")
@@ -46,22 +50,19 @@ class PDFViewer():
         self.menubar = {}
         self.menubar["File"] = {
             "Open": self.backend.open,
-            "Save": self.backend.save,
             "Export": self.backend.export,
             "Close": self.backend.close,
             "Exit": self.backend.exit,
         }
-        self.menubar["Other"] = {
-            "Open": self.backend.open,
-            "Save": self.backend.save,
-            "Export": self.backend.export,
-            "Close": self.backend.close,
-            "Exit": self.backend.exit,
+        self.menubar["Edit"] = {
+            "Encrypt": self.backend.encrypt,
+            "Merge": self.backend.merge,
+            "Split": self.backend.split,
         }
-        self.menubar_commands = {
-            "File": self.select_option_file_menu,
-            "Other": self.select_option_file_menu
-        }
+        # self.menubar_commands = {
+        #     "File": self.select_option_file_menu,
+        #     "Edit": self.select_option_edit_menu
+        # }
 
     def launch(self):
         self.app.mainloop()

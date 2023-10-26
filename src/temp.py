@@ -1,37 +1,30 @@
 import tkinter as tk
-from tkinter import messagebox
-import fitz  # PyMuPDF
 
-def open_pdf():
-    password = password_entry.get()
-    password_window.destroy()
-    try:
-        pdf_file = fitz.open('your_pdf_file.pdf')
-        if pdf_file.is_encrypted:
-            pdf_file.authenticate(password)
-            messagebox.showinfo("Success", "PDF file opened successfully!")
-        else:
-            messagebox.showinfo("Info", "PDF file is not encrypted.")
-    except Exception as e:
-        messagebox.showerror("Error", str(e))
+class YourClass:
+    def __init__(self, master):
+        self.master = master
+        self.password = ""
+        self.password_window = None
+        self.password_entry = None
 
-root = tk.Tk()
-root.title('PDF Reader')
+    def open_pdf(self):
+        password = self.password_entry.get()
+        self.password_window.destroy()
+        # pdf_file = fitz.open('your_pdf_file.pdf')
+        # if pdf_file.is_encrypted:
+        #     pdf_file.authenticate(password)
+        #     # ttk.messagebox.showinfo("Success", "PDF file opened successfully!")
+        self.password = password
 
-open_button = tk.Button(root, text="Open PDF", command=lambda: password_window.deiconify())
-open_button.pack()
+    def get_password(self):
+        self.password_window = tk.Toplevel(self.master)
+        self.password_window.title('Enter Password')
 
-password_window = tk.Toplevel(root)
-password_window.title('Enter Password')
-password_window.withdraw()
+        password_label = tk.Label(self.password_window, text="Enter Password:")
+        password_label.pack()
 
-password_label = tk.Label(password_window, text="Enter Password:")
-password_label.pack()
+        self.password_entry = tk.Entry(self.password_window, show="*")
+        self.password_entry.pack()
 
-password_entry = tk.Entry(password_window, show="*")
-password_entry.pack()
-
-submit_button = tk.Button(password_window, text="Submit", command=open_pdf)
-submit_button.pack()
-
-root.mainloop()
+        submit_button = tk.Button(self.password_window, text="Submit", command=self.open_pdf)
+        submit_button.pack()
