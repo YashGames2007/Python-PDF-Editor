@@ -2,6 +2,7 @@ import os
 import sys
 import pikepdf
 from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from ctknotebook import CustomNotebook
 from tkinter import filedialog as fd
@@ -95,18 +96,38 @@ class PDFViewerFunctions:
 
 
     def encrypt(self) -> None:
-        self.pdf_view.set_password()
         current_tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
         _, path, password = self.pdf_view.pdf_objects[self.text_map[current_tab_id]]
         pdf = pikepdf.Pdf.open(path) if password is None else pikepdf.Pdf.open(path, password=password)
-        storage_path = fd.askdirectory(title="Select Folder to Store Encrypted PDF.")
-        path = os.path.join(storage_path, os.path.basename(path))[:-4] + "_encrypted.pdf"
+        default_name = os.path.basename(path)[:-4] + "_encrypted.pdf"
+        self.pdf_view.set_password()
+        self.pdf_view.password_window.focus()
+        storage_path = fd.asksaveasfilename(title="Save Encrypted PDF as", defaultextension=".pdf", initialfile=default_name, filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
+        if not storage_path:
+            return
         password = self.pdf_view.password
         pdf.save(path, encryption=pikepdf.Encryption(owner=password, user=password, R=4))
         pdf.close()
 
     def merge(self) -> None:
-        print("Pressed merge")
+        merged_pdf = fitz.open()
+
+        if len(self.pdf_view.pdf_objects.items()) < 2:
+            tk.messagebox.showerror("Error", str("Open at least 2 PDFs to merge them.!"))
+            return
+
+        for text, value in self.pdf_view.pdf_objects.items():
+            _, path, password = value
+            pdf = fitz.open(path)
+            if password:
+                pdf.authenticate(password)
+            merged_pdf.insert_pdf(pdf)
+        
+        storage_path = fd.asksaveasfilename(title="Save the Merged File.", defaultextension=".pdf", initialfile='Merged.pdf', filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
+        merged_pdf.save(storage_path)
+        
+
+
     def split(self) -> None:
         print("Pressed split")
     def export(self) -> None:
