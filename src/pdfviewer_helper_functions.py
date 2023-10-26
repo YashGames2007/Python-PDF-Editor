@@ -21,7 +21,8 @@ def print_selected_pages(input_pdf, password):
     for i in pages:
         new_doc.insert_pdf(doc, from_page=i, to_page=i)
 
-    storage_path = fd.asksaveasfilename(title="Save the Splitted File.", defaultextension=".pdf", initialfile='Merged.pdf', filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
+    name = os.path.basename(input_pdf)[:-4] + "_splitted.pdf"
+    storage_path = fd.asksaveasfilename(title="Save the Splitted File.", defaultextension=".pdf", initialfile=name, filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
     if not storage_path:
         return
     new_doc.save(storage_path)
@@ -62,7 +63,7 @@ def show_toast(message):
     screen_height = toast.winfo_screenheight()
     x_coordinate = int((screen_width/2) - (200/2))
     y_coordinate = int((screen_height) - (100))
-    toast.geometry("175x30+{}+{}".format(x_coordinate, y_coordinate))
+    toast.geometry("225x30+{}+{}".format(x_coordinate, y_coordinate))
 
     # Set the background color and message
     ctk.CTkLabel(toast, text=message, corner_radius=10).pack()

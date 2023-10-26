@@ -3,6 +3,5 @@ pymupdf
 tkPDFViewer
 pillow
 pdf2image
-pytesseract
 pyperclip
 pikepdf
