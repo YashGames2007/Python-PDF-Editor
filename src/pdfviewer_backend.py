@@ -10,18 +10,23 @@ from CTkMenuBar import dropdown_menu
 from PIL import ImageTk, Image
 # from miner import PDFMiner
 import pdfviewer_helper_functions as func
+import image_editor
 
 class TabLayout:
     def __init__(self, root) -> None:
         self.app = root
         self.tab_control = CustomNotebook(root)
+        self.image_editor = image_editor.PDFImageEditor(self.app)
         self.dropdown = {
-            "Extract Text  ": None,
-            "Extract Page  ": None,
-            "Other Option  ": None,
-            "Another One   ": None,
+            "Extract Text  ": self.image_editor.extract_text,
+            "Extract Page  ": self.image_editor.extract_page,
+            "Other Option  ": self.image_editor.extract_text,
+            "Another One   ": self.image_editor.extract_page,
         }
         # self.file_dropdown_menu.pack()
+
+    def set_pdfviewer(self, pdf_viewer):
+        self.pdf_viewer = pdf_viewer
 
     def create_new_tab(self, tab_name:str) -> ttk.Frame:
         new_tab = ttk.Frame(self.tab_control)
@@ -29,10 +34,8 @@ class TabLayout:
         self.tab_control.select(new_tab)
         self.tab_control.pack(expand=1, fill='both')  # pack the tab control here
         return new_tab, self.tab_control.select()
-    
-    def select_dropdown_menu(self, option):
-        print(f'Option selected: {option}')
-        self.file_dropdown_menu.place_forget()
+        # except Exception:
+        #     pass
 
 
     def show_menu(self, event):
@@ -43,7 +46,7 @@ class TabLayout:
             self.file_dropdown_menu.place_forget()
         except Exception:
             pass
-        self.file_dropdown_menu = func.DropdownMenu(self.tab_control, text='Edit', width=50, fg_color="black", bg_color="transparent", command=self.select_dropdown_menu, options=self.dropdown.keys())
+        self.file_dropdown_menu = func.DropdownMenu(self.tab_control, text='Edit', width=50, fg_color="black", bg_color="transparent", command=self.pdf_viewer.select_dropdown_menu, options=self.dropdown.keys())
         self.file_dropdown_menu.place(x=event.x, y=event.y)
         # popup = Menu(self.app, tearoff=0)
         # popup.add_command(label='Option 1')
@@ -64,9 +67,18 @@ class PDFViewerFunctions:
         self.tab_layout = TabLayout(self.app)
         self.text_map = {}
         self.pdf_view = pdf_viewer.ShowPdf()
+        self.tab_layout.set_pdfviewer(self)
         # self.tab_layout.set_widget(self.)
 
-    def get_page(self, event):
+
+    def select_dropdown_menu(self, option):
+        # try:
+            # print(f'Option selected: {option}')
+        page = self.get_page()
+        self.tab_layout.dropdown[option](page)
+        self.tab_layout.file_dropdown_menu.place_forget()
+
+    def get_page(self):
         try:
             id = self.tab_layout.tab_control.select()
             text_widget = self.text_map[id]
@@ -82,6 +94,7 @@ class PDFViewerFunctions:
             pil_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
             # pil_image.show()
             pdf.close()
+            return pil_image
             # current_page = pages[index]
 
             # width, height = current_page.width(), current_page.height()

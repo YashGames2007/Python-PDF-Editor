@@ -1,22 +1,34 @@
-import fitz  # PyMuPDF
-from PIL import Image
+# from PIL import Image
+# import pytesseract
+# pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+# image = Image.open("D:\\Programming files\\GitHub\\Repositories\\Python-PDF-Editor\\rs\\pyimage13.png")
+# text = pytesseract.image_to_string(image)
+# print(text)
 
-# Open the PDF file
-pdf_document = "D:\\Programming files\\GitHub\\Repositories\\Python-PDF-Editor\\storytelling-with-data-cole-nussbaumer-knaflic.pdf"
-pdf = fitz.open(pdf_document)
+import customtkinter as ctk
+import time
 
-# Define the page number you want to extract (e.g., page 1)
-page_number = 0  # Note: Pages are 0-based.
+def show_toast(message):
+    toast = ctk.CTkToplevel()
+    toast.configure(corner_radius=4)
+    toast.overrideredirect(1)
 
-# Get the specific page
-page = pdf.load_page(page_number)
+    # Position the toast window
+    screen_width = toast.winfo_screenwidth()
+    screen_height = toast.winfo_screenheight()
+    x_coordinate = int((screen_width/2) - (200/2))
+    y_coordinate = int((screen_height) - (100))
+    toast.geometry("175x30+{}+{}".format(x_coordinate, y_coordinate))
 
-# Convert the page to a Pillow image
-image = page.get_pixmap()
-pillow_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
-pillow_image.show()
-# Save or process the extracted image as needed
-# pillow_image.save("extracted_page.png")
+    # Set the background color and message
+    ctk.CTkLabel(toast, text=message, corner_radius=10).pack()
 
-# Close the PDF document
-pdf.close()
+    # Show the toast for 1 second then destroy
+    toast.after(2500, toast.destroy)
+
+root = ctk.CTk()
+button = ctk.CTkButton(root, text="Copy Text", command=lambda: show_toast("Text Copied to Clipboard."))
+button.pack()
+
+root.mainloop()
+

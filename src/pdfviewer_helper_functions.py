@@ -2,7 +2,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog as fd
 import customtkinter as ctk
-import fitz  # PyMuPDF
+# import fitz  # PyMuPDF
 from PIL import Image, ImageTk
 from pdf2image import convert_from_path
 
@@ -12,6 +12,25 @@ def pdf_to_images(pdf_path):
 def get_pdf_file_dialog():
     filepath = fd.askopenfilename(title='Select a PDF file', initialdir=os.getcwd(), filetypes=(('PDF', '*.pdf'), ))
     return filepath
+
+
+def show_toast(message):
+    toast = ctk.CTkToplevel()
+    toast.configure(corner_radius=4)
+    toast.overrideredirect(1)
+
+    # Position the toast window
+    screen_width = toast.winfo_screenwidth()
+    screen_height = toast.winfo_screenheight()
+    x_coordinate = int((screen_width/2) - (200/2))
+    y_coordinate = int((screen_height) - (100))
+    toast.geometry("175x30+{}+{}".format(x_coordinate, y_coordinate))
+
+    # Set the background color and message
+    ctk.CTkLabel(toast, text=message, corner_radius=10).pack()
+
+    # Show the toast for 1 second then destroy
+    toast.after(2500, toast.destroy)
 
 class DropdownMenu(ctk.CTkButton):
     def __init__(self, master=None, options=None, command=None,**kwargs):
