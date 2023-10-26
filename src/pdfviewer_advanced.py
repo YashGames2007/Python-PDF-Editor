@@ -50,6 +50,7 @@ class PDFViewer():
         self.menubar = {}
         self.menubar["File"] = {
             "Open": self.backend.open,
+            "Save": self.backend.save,
             "Export": self.backend.export,
             "Close": self.backend.close,
             "Exit": self.backend.exit,

@@ -80,6 +80,17 @@ class PDFViewerFunctions:
         except Exception as e:
             pass
 
+    def save(self) -> None:
+        current_tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
+        _, path, password = self.pdf_view.pdf_objects[self.text_map[current_tab_id]]
+        pdf = pikepdf.Pdf.open(path) if password is None else pikepdf.Pdf.open(path, password=password, allow_overwriting_input=True)
+        default_name = os.path.basename(path)[:-4] + "_copy.pdf"
+        storage_path = fd.asksaveasfilename(title="Save Copy of PDF as", defaultextension=".pdf", initialfile=default_name, filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
+        if not storage_path:
+            return
+        pdf.save(storage_path)
+        pdf.close()
+
     def open(self) -> None:
         # Get a PDF from User Input
         file_path = func.get_pdf_file_dialog()
@@ -88,7 +99,11 @@ class PDFViewerFunctions:
         
         
         pdf_tab, tab_id = self.tab_layout.create_new_tab(os.path.basename(file_path))
-        pdf_frame, pdf_text = self.pdf_view.pdf_view(self.app, frame=pdf_tab, pdf_location=file_path, width=400)
+        output = self.pdf_view.pdf_view(self.app, frame=pdf_tab, pdf_location=file_path, width=400)
+        if not output:
+            self.close()
+            return
+        pdf_frame, pdf_text = output
         pdf_frame.pack()
         
         pdf_text.bind("<Button-1>", self.tab_layout.show_menu)
@@ -100,13 +115,14 @@ class PDFViewerFunctions:
         _, path, password = self.pdf_view.pdf_objects[self.text_map[current_tab_id]]
         pdf = pikepdf.Pdf.open(path) if password is None else pikepdf.Pdf.open(path, password=password)
         default_name = os.path.basename(path)[:-4] + "_encrypted.pdf"
-        self.pdf_view.set_password()
-        self.pdf_view.password_window.focus()
+        password_window = ctk.CTkInputDialog(text="Enter password for PDF Encryption", title="Encrypt PDF")
+        password = password_window.get_input()
+        if not password:
+            return
         storage_path = fd.asksaveasfilename(title="Save Encrypted PDF as", defaultextension=".pdf", initialfile=default_name, filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
         if not storage_path:
             return
-        password = self.pdf_view.password
-        pdf.save(path, encryption=pikepdf.Encryption(owner=password, user=password, R=4))
+        pdf.save(storage_path, encryption=pikepdf.Encryption(owner=password, user=password, R=4))
         pdf.close()
 
     def merge(self) -> None:
@@ -125,22 +141,32 @@ class PDFViewerFunctions:
         
         storage_path = fd.asksaveasfilename(title="Save the Merged File.", defaultextension=".pdf", initialfile='Merged.pdf', filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
         merged_pdf.save(storage_path)
-        
-
 
     def split(self) -> None:
-        print("Pressed split")
+        current_tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
+        _, path, password = self.pdf_view.pdf_objects[self.text_map[current_tab_id]]
+        func.print_selected_pages(path, password)
+
     def export(self) -> None:
         print("Pressed export")
+
     def close(self, tab_id=None) -> None:
         if tab_id is None:
-            tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
-            self.tab_layout.tab_control.forget(tab_id)
+            try:
+                tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
+                self.tab_layout.tab_control.forget(tab_id)
+            except:
+                pass
         # tab_id = self.tab_layout.tab_control.index(tab_id)
-        del self.pdf_view.pdf_objects[self.text_map[tab_id]]
-        del self.text_map[tab_id]
+        try:
+            del self.pdf_view.pdf_objects[self.text_map[tab_id]]
+        except:
+            pass
+        try:
+            del self.text_map[tab_id]
+        except:
+            pass
+
     def exit(self) -> None:
         self.app.destroy()
         sys.exit()
-
-

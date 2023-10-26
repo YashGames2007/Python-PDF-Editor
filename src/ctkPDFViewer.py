@@ -17,53 +17,6 @@ class ShowPdf():
     image_object_li = []
     max_width = 0
     pdf_objects = {}
-    password = ""
-        
-
-    def open_pdf(self):
-        password = self.password_entry.get()
-        self.password_window.destroy()
-        # pdf_file = fitz.open('your_pdf_file.pdf')
-        # if pdf_file.is_encrypted:
-        #     pdf_file.authenticate(password)
-        #     # ttk.messagebox.showinfo("Success", "PDF file opened successfully!")
-        self.password = password
-
-    def get_password(self):
-        self.password = ""
-        self.password_window = CTkToplevel(self.master)
-        self.password_window.title('Enter Password')
-        # self.password_window.withdraw()
-
-        self.password_label = CTkLabel(self.password_window, text="Enter Password:")
-        self.password_label.pack()
-
-        self.password_entry = CTkEntry(self.password_window, show="*")
-        self.password_entry.pack()
-
-        self.submit_button = CTkButton(self.password_window, text="Submit", command=self.open_pdf)
-        self.submit_button.pack()
-
-        while self.password == "":
-            pass
-        password = self.password[:]
-        self.password = ""
-        return password
-
-    def set_password(self):
-        self.password = ""
-        self.password_window = CTkToplevel(self.master)
-        self.password_window.title('Enter Password')
-        # self.password_window.withdraw()
-
-        self.password_label = CTkLabel(self.password_window, text="Enter Password:")
-        self.password_label.pack()
-
-        self.password_entry = CTkEntry(self.password_window, show="*")
-        self.password_entry.pack()
-
-        self.submit_button = CTkButton(self.password_window, text="Submit", command=self.open_pdf)
-        self.submit_button.pack()
 
     def pdf_view(self, master, frame=None, width=1200, height=600, pdf_location="", bar=True, load="after"):
         self.master = master
@@ -98,9 +51,11 @@ class ShowPdf():
             open_pdf = fitz.open(pdf_location)
             password = None
             while open_pdf.isEncrypted:
-                password = self.get_password()
+                messagebox = CTkInputDialog(text="Enter Password to open PDF", title="Decrypt PDF")
+                password = messagebox.get_input()
+                if password is None:
+                    return None
                 open_pdf.authenticate(password)
-                self.password = ""
                 if not open_pdf.isEncrypted:
                     break
                 tk.messagebox.showerror("Error", str("!WRONG PASSWORD!"))

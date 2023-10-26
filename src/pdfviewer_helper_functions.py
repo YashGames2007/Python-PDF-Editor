@@ -5,6 +5,44 @@ import customtkinter as ctk
 # import fitz  # PyMuPDF
 from PIL import Image, ImageTk
 from pdf2image import convert_from_path
+import fitz  # this is pymupdf
+import tkinter as tk
+from tkinter import simpledialog
+
+
+
+def print_selected_pages(input_pdf, password):
+    pages_string = get_pages()
+    doc = fitz.open(input_pdf)
+    if password:
+        doc.authenticate(password)
+    new_doc = fitz.open()
+    pages = extract_pages(pages_string)
+    for i in pages:
+        new_doc.insert_pdf(doc, from_page=i, to_page=i)
+
+    storage_path = fd.asksaveasfilename(title="Save the Splitted File.", defaultextension=".pdf", initialfile='Merged.pdf', filetypes=(("PDF files", "*.pdf"), ("All files", "*.*")))
+    if not storage_path:
+        return
+    new_doc.save(storage_path)
+
+def extract_pages(input_string):
+    pages = []
+    for part in input_string.split(','):
+        if '-' in part:
+            start, end = map(int, part.split('-'))
+            pages.extend(range(start, end+1))
+        else:
+            pages.append(int(part))
+    return [page-1 for page in pages]
+
+def get_pages():
+    # Create a simple dialog to get user input
+    # root = tk.Tk()
+    # root.withdraw()  # Hide the main window
+    dialog = ctk.CTkInputDialog(text="Enter the page numbers (comma-separated or range):", title="Split PDF")
+    pages = dialog.get_input()  # waits for input
+    return pages
 
 def pdf_to_images(pdf_path):
     return convert_from_path(pdf_path)
