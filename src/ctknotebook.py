@@ -6,10 +6,11 @@ class CustomNotebook(ttk.Notebook):
 
     __initialized = False
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, on__close=None, *args, **kwargs):
         if not self.__initialized:
             self.__initialize_custom_style()
             self.__inititialized = True
+            self.on__close = on__close
 
         kwargs["style"] = "CustomNotebook"
         ttk.Notebook.__init__(self, *args, **kwargs)
@@ -45,6 +46,7 @@ class CustomNotebook(ttk.Notebook):
         if self._active == index:
             self.forget(index)
             self.event_generate("<<NotebookTabClosed>>")
+            self.on__close(index)
 
         self.state(["!pressed"])
         self._active = None

@@ -1,4 +1,6 @@
 import os
+import sys
+import pikepdf
 from tkinter import *
 from tkinter import ttk
 from ctknotebook import CustomNotebook
@@ -15,7 +17,7 @@ import image_editor
 class TabLayout:
     def __init__(self, root) -> None:
         self.app = root
-        self.tab_control = CustomNotebook(root)
+        self.tab_control = CustomNotebook(master=root, on__close=self.delete_tab)
         self.image_editor = image_editor.PDFImageEditor(self.app)
         self.dropdown = {
             "Extract Text  ": self.image_editor.extract_text,
@@ -23,23 +25,23 @@ class TabLayout:
             "Other Option  ": self.image_editor.extract_text,
             "Another One   ": self.image_editor.extract_page,
         }
-        # self.file_dropdown_menu.pack()
 
     def set_pdfviewer(self, pdf_viewer):
         self.pdf_viewer = pdf_viewer
+
+    def delete_tab(self, tab_id):
+        self.pdf_viewer.close(tab_id)
 
     def create_new_tab(self, tab_name:str) -> ttk.Frame:
         new_tab = ttk.Frame(self.tab_control)
         self.tab_control.add(new_tab, text=tab_name)
         self.tab_control.select(new_tab)
         self.tab_control.pack(expand=1, fill='both')  # pack the tab control here
-        return new_tab, self.tab_control.select()
-        # except Exception:
-        #     pass
+        return new_tab, self.tab_control.index(self.tab_control.select())
+
 
 
     def show_menu(self, event):
-        # Create a menu
 
         try:
             self.file_dropdown_menu.menu.withdraw()
@@ -48,17 +50,6 @@ class TabLayout:
             pass
         self.file_dropdown_menu = func.DropdownMenu(self.tab_control, text='Edit', width=50, fg_color="black", bg_color="transparent", command=self.pdf_viewer.select_dropdown_menu, options=self.dropdown.keys())
         self.file_dropdown_menu.place(x=event.x, y=event.y)
-        # popup = Menu(self.app, tearoff=0)
-        # popup.add_command(label='Option 1')
-        # popup.add_command(label='Option 2')
-        # popup.add_command(label='Option 3')
-
-        # Show the menu
-        # try:
-        #     popup.tk_popup(event.x_root, event.y_root)
-        # finally:
-        #     # make sure to release the grab (Tk 8.0a1 only)
-        #     popup.grab_release()
 
 
 class PDFViewerFunctions:
@@ -72,39 +63,20 @@ class PDFViewerFunctions:
 
 
     def select_dropdown_menu(self, option):
-        # try:
-            # print(f'Option selected: {option}')
-        page = self.get_page()
-        self.tab_layout.dropdown[option](page)
+        pdf_path, page_no, password = self.get_pdf()
+        self.tab_layout.dropdown[option](pdf_path, page_no, password)
         self.tab_layout.file_dropdown_menu.place_forget()
 
-    def get_page(self):
+    def get_pdf(self):
         try:
             id = self.tab_layout.tab_control.select()
             text_widget = self.text_map[id]
-            photo_image_pages, path = self.pdf_view.pdf_objects[text_widget]
+            photo_image_pages, path, password = self.pdf_view.pdf_objects[text_widget]
 
             # Get the name of the image under the cursor
             index = int(text_widget.image_cget("current", "name"))
-            print(f"Selected image: '{index}', {len(photo_image_pages)}")
-
-            pdf = fitz.open(path)
-            page = pdf.load_page(index)
-            image = page.get_pixmap()
-            pil_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
-            # pil_image.show()
-            pdf.close()
-            return pil_image
-            # current_page = pages[index]
-
-            # width, height = current_page.width(), current_page.height()
-            # img = Image.frombytes("RGBA", (width, height), data)
-            # img.show()
-
-
+            return path, index, password
         except Exception as e:
-            # No image under the cursor
-            print(e)
             pass
 
     def open(self) -> None:
@@ -122,11 +94,32 @@ class PDFViewerFunctions:
         self.text_map[tab_id] = pdf_text
 
 
-    def save(self) -> None:
-        pass
+    def encrypt(self) -> None:
+        self.pdf_view.set_password()
+        current_tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
+        _, path, password = self.pdf_view.pdf_objects[self.text_map[current_tab_id]]
+        pdf = pikepdf.Pdf.open(path) if password is None else pikepdf.Pdf.open(path, password=password)
+        storage_path = fd.askdirectory(title="Select Folder to Store Encrypted PDF.")
+        path = os.path.join(storage_path, os.path.basename(path))[:-4] + "_encrypted.pdf"
+        password = self.pdf_view.password
+        pdf.save(path, encryption=pikepdf.Encryption(owner=password, user=password, R=4))
+        pdf.close()
+
+    def merge(self) -> None:
+        print("Pressed merge")
+    def split(self) -> None:
+        print("Pressed split")
     def export(self) -> None:
-        pass
-    def close(self) -> None:
-        pass
+        print("Pressed export")
+    def close(self, tab_id=None) -> None:
+        if tab_id is None:
+            tab_id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
+            self.tab_layout.tab_control.forget(tab_id)
+        # tab_id = self.tab_layout.tab_control.index(tab_id)
+        del self.pdf_view.pdf_objects[self.text_map[tab_id]]
+        del self.text_map[tab_id]
     def exit(self) -> None:
-        pass
+        self.app.destroy()
+        sys.exit()
+
+
