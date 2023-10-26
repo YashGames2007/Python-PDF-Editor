@@ -1,14 +1,22 @@
-import tkinter as tk
+import fitz  # PyMuPDF
+from PIL import Image
 
-def get_selected_text():
-    selected_text = text_widget.selection_get()
-    print("Selected text:", selected_text)
+# Open the PDF file
+pdf_document = "D:\\Programming files\\GitHub\\Repositories\\Python-PDF-Editor\\storytelling-with-data-cole-nussbaumer-knaflic.pdf"
+pdf = fitz.open(pdf_document)
 
-root = tk.Tk()
-text_widget = tk.Text(root)
-text_widget.pack()
-text_widget.insert('1.0', "This is some sample text.")
-button = tk.Button(root, text="Get Selected Text", command=get_selected_text)
-button.pack()
+# Define the page number you want to extract (e.g., page 1)
+page_number = 0  # Note: Pages are 0-based.
 
-root.mainloop()
+# Get the specific page
+page = pdf.load_page(page_number)
+
+# Convert the page to a Pillow image
+image = page.get_pixmap()
+pillow_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
+pillow_image.show()
+# Save or process the extracted image as needed
+# pillow_image.save("extracted_page.png")
+
+# Close the PDF document
+pdf.close()

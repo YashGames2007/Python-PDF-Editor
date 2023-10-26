@@ -76,7 +76,7 @@ class ShowPdf():
                 page_text.insert(END,"\n\n")
                 _index += 1
             page_text.configure(state="disabled")
-            self.pdf_objects[page_text] = (self.img_object_li[:], self.image_object_li[:])
+            self.pdf_objects[page_text] = (self.img_object_li[:], pdf_location)
             master.geometry(f"{self.max_width}x{master.winfo_height()}")
 
         def start_pack():

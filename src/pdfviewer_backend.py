@@ -5,6 +5,7 @@ from ctknotebook import CustomNotebook
 from tkinter import filedialog as fd
 import customtkinter as ctk
 import ctkPDFViewer as pdf_viewer
+import fitz  # PyMuPDF
 from PIL import ImageTk, Image
 # from miner import PDFMiner
 import pdfviewer_helper_functions as func
@@ -33,12 +34,19 @@ class PDFViewerFunctions:
         try:
             id = self.tab_layout.tab_control.select()
             text_widget = self.text_map[id]
-            pages = self.pdf_view.pdf_objects[text_widget]
+            photo_image_pages, path = self.pdf_view.pdf_objects[text_widget]
 
             # Get the name of the image under the cursor
             index = int(text_widget.image_cget("current", "name"))
-            print(f"Selected image: '{index}', {len(pages)}")
-            current_page = pages[index]
+            print(f"Selected image: '{index}', {len(photo_image_pages)}")
+
+            pdf = fitz.open(path)
+            page = pdf.load_page(index)
+            image = page.get_pixmap()
+            pil_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
+            pil_image.show()
+            pdf.close()
+            # current_page = pages[index]
 
             # width, height = current_page.width(), current_page.height()
             # img = Image.frombytes("RGBA", (width, height), data)
