@@ -72,8 +72,6 @@ class PDFViewerFunctions:
 
 
     def select_dropdown_menu(self, option):
-        # try:
-            # print(f'Option selected: {option}')
         pdf_path, page_no = self.get_pdf()
         self.tab_layout.dropdown[option](pdf_path, page_no)
         self.tab_layout.file_dropdown_menu.place_forget()
@@ -86,25 +84,8 @@ class PDFViewerFunctions:
 
             # Get the name of the image under the cursor
             index = int(text_widget.image_cget("current", "name"))
-            # print(f"Selected image: '{index}', {len(photo_image_pages)}")
-
-            # pdf = fitz.open(path)
-            # page = pdf.load_page(index)
-            # image = page.get_pixmap()
-            # pil_image = Image.frombytes("RGB", [image.width, image.height], image.samples)
-            # # pil_image.show()
-            # pdf.close()
             return path, index
-            # current_page = pages[index]
-
-            # width, height = current_page.width(), current_page.height()
-            # img = Image.frombytes("RGBA", (width, height), data)
-            # img.show()
-
-
         except Exception as e:
-            # No image under the cursor
-            print(e)
             pass
 
     def open(self) -> None:

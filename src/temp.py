@@ -1,34 +1,37 @@
-# from PIL import Image
-# import pytesseract
-# pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
-# image = Image.open("D:\\Programming files\\GitHub\\Repositories\\Python-PDF-Editor\\rs\\pyimage13.png")
-# text = pytesseract.image_to_string(image)
-# print(text)
+import tkinter as tk
+from tkinter import messagebox
+import fitz  # PyMuPDF
 
-import customtkinter as ctk
-import time
+def open_pdf():
+    password = password_entry.get()
+    password_window.destroy()
+    try:
+        pdf_file = fitz.open('your_pdf_file.pdf')
+        if pdf_file.is_encrypted:
+            pdf_file.authenticate(password)
+            messagebox.showinfo("Success", "PDF file opened successfully!")
+        else:
+            messagebox.showinfo("Info", "PDF file is not encrypted.")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-def show_toast(message):
-    toast = ctk.CTkToplevel()
-    toast.configure(corner_radius=4)
-    toast.overrideredirect(1)
+root = tk.Tk()
+root.title('PDF Reader')
 
-    # Position the toast window
-    screen_width = toast.winfo_screenwidth()
-    screen_height = toast.winfo_screenheight()
-    x_coordinate = int((screen_width/2) - (200/2))
-    y_coordinate = int((screen_height) - (100))
-    toast.geometry("175x30+{}+{}".format(x_coordinate, y_coordinate))
+open_button = tk.Button(root, text="Open PDF", command=lambda: password_window.deiconify())
+open_button.pack()
 
-    # Set the background color and message
-    ctk.CTkLabel(toast, text=message, corner_radius=10).pack()
+password_window = tk.Toplevel(root)
+password_window.title('Enter Password')
+password_window.withdraw()
 
-    # Show the toast for 1 second then destroy
-    toast.after(2500, toast.destroy)
+password_label = tk.Label(password_window, text="Enter Password:")
+password_label.pack()
 
-root = ctk.CTk()
-button = ctk.CTkButton(root, text="Copy Text", command=lambda: show_toast("Text Copied to Clipboard."))
-button.pack()
+password_entry = tk.Entry(password_window, show="*")
+password_entry.pack()
+
+submit_button = tk.Button(password_window, text="Submit", command=open_pdf)
+submit_button.pack()
 
 root.mainloop()
-
