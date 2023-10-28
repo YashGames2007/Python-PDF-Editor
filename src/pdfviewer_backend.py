@@ -77,7 +77,7 @@ class PDFViewerFunctions:
 
     def get_pdf(self):
         try:
-            id = self.tab_layout.tab_control.select()
+            id = self.tab_layout.tab_control.index(self.tab_layout.tab_control.select())
             text_widget = self.text_map[id]
             photo_image_pages, path, password = self.pdf_view.pdf_objects[text_widget]
 
@@ -172,6 +172,7 @@ class PDFViewerFunctions:
         new_path = os.path.join(os.path.dirname(path), rename)
         os.rename(path, new_path)
         self.tab_layout.tab_control.tab(current_tab_id, text=rename)
+        self.pdf_view.pdf_objects[self.text_map[current_tab_id]] = _, new_path, password
         show_toast("PDF Renamed Successfully.!")
 
     def export_to_html(self) -> None:

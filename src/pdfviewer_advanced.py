@@ -18,6 +18,7 @@ class PDFViewer():
     def __init__(self):
         
         self.app = ctk.CTk()
+        self.app.title("PDF Editor")
         self.backend = backend.PDFViewerFunctions(self.app)
         self.app.geometry(f"{self.width}x{self.height}")
         self.map_functions()
